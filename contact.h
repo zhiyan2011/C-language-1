@@ -53,6 +53,10 @@ void ModifyContact(Contact* pc);
 // sort by name/age
 void SortContact(Contact* pc);
 void DestroyContact(Contact* pc);
+void SaveContact(const Contact* pc);
+void LoadContact(Contact* pc);
+
+
 
 
 

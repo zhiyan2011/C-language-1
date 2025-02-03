@@ -9,6 +9,45 @@
 //     memset(pc->data, 0, sizeof(pc->data));//
 // }
 //动态版本
+   void CheckCapacity(Contact* pc)
+    {
+        if (pc->count == pc->capacity)
+    {
+         PeoInfo* ptr= realloc(pc->data, (pc->capacity+ INC_SZ)*sizeof(PeoInfo));
+         if (ptr == NULL)
+         {
+            printf("AddContact:%s\n", strerror(errno));
+            return;
+         }
+         else
+         {
+          pc->data = ptr;
+          pc-> capacity += INC_SZ;
+          printf("add success.\n");
+         }
+    }
+    }
+//动态版本 
+//每次打开通讯录，自动加载已有的通讯录
+void LoadContact(Contact* pc)
+{
+    FILE* pfRead = fopen("contact.txt","rb");
+    if (pfRead = NULL)
+    {
+        perror("LoadContact");
+        return 1;
+    }
+    PeoInfo tmp = {0};
+    while(fread(&tmp, sizeof(PeoInfo), 1, pfRead)== 1 )//fread 返回的是成功读取的个数
+    {
+      CheckCapacity(pc);
+      pc->data[pc->count] = tmp;
+      pc->count++;
+    }
+    fclose(pfRead);
+    pfRead = NULL;
+}
+
 int InitContact(Contact* pc)
 {
     assert(pc);
@@ -20,6 +59,8 @@ int InitContact(Contact* pc)
         return 1;
     }
     pc->capacity = DEFAULT_SZ;
+    //加载文件的信息到通讯录
+    LoadContact(pc);
     return 0;
 }
 //静态版本
@@ -44,25 +85,7 @@ int InitContact(Contact* pc)
 //     pc->count ++;
 //     printf("addtion success\n");
 // }
-//动态版本
-   void CheckCapacity(Contact* pc)
-    {
-        if (pc->count == pc->capacity)
-    {
-         PeoInfo* ptr= realloc(pc->data, (pc->capacity+ INC_SZ)*sizeof(PeoInfo));
-         if (ptr == NULL)
-         {
-            printf("AddContact:%s\n", strerror(errno));
-            return;
-         }
-         else
-         {
-          pc->data = ptr;
-          pc-> capacity += INC_SZ;
-          printf("add success.\n");
-         }
-    }
-    }
+
 
 void AddContact(Contact* pc)
 {
@@ -204,6 +227,24 @@ void DestroyContact(Contact* pc)
     assert(pc);
     free(pc->data);
     pc->data = NULL;
+}
+void SaveContact(const Contact* pc)
+{
+    assert(pc);
+    FILE* pfWrite = fopen("contact,txt", "wb");
+    if (pfWrite == NULL)
+    {
+        perror("SaveContact");
+        return 1;
+    }
+    //写文件-二进制形式
+    int i =0;
+    for (i= 0; i< pc->count; i++)
+    {
+        fwrite(pc->data+i, sizeof(PeoInfo),1, pfWrite);
+    }
+    fclose(pfWrite);
+    pfWrite = NULL;
 }
 
 
