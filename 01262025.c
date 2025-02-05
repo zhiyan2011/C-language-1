@@ -333,9 +333,144 @@
 //《程序员的自我修养》
 
 //预处理详解
-//预处理符号
-int main()
-{
-    int i =0;
-}
+//预处理符号5 
 
+//宏
+// #define double(x) ((x)+(x))// define 后面有空格，多加括号
+// 在程序中#define 定义符号和宏时，需要涉及几个步骤
+//1. 在调用宏时，首先对参数进行检查，看看是否包含任何由#define定义的符号。如果是，他们首先被替换
+// 2.替换文本随后被插入到程序中原来文本的位置，对于宏，参数名被他们的值所替换
+//3. 最后，再次对结果文件进行扫描，看看它是否包含任何由#define定义的符号，如果是，就重复上述处理过程
+//注意：
+//1。 宏参数和#define定义中可以出现其他#define定义的符号，但是对于宏，不能出现递归
+//2.当预处理器搜索#define定义的符号时候，字符串常量的内容并不被搜索。
+//例如
+// #define M 100
+// #define Double(x) ((x)+(x))
+// int main()
+// {
+//     Double(M+2);
+//     // 1.Double(100 +2);
+//     //2.((100+2)+(100+2))
+//     //Double不能调用Double
+//     //"M" 这时的M不会被替换
+
+//     return 0;
+// }
+
+
+// # 和 ##
+// #define PRINT(N) printf("the value of "#N " is %d \n",N)//#N 对应"a" 这里相当于将#N插入两个字符串
+// #define PRINT(N,FORMAT) printf("the value of "#N" id" Format"\n", N)
+// int main()
+// {
+//     printf("hello world");
+//     printf("hello""world"); //两个一样打印
+//     int a =10;
+//     // printf("the value of is a is %d\n", a);//写成宏
+//     PTINT(a);
+//     int b= 20;
+//     // printf("the value of is b is %d\n", b);//写成宏
+//     PTINT(b);
+//     float f = 3.14f;
+//     PTINT(f,"%1f");
+
+//     return 0;
+// }
+
+
+//## 可以把位于它两边的符号合成一个符号。它允许宏定义从分离的文本片段创建标识符
+// #define CAT(Class, Num) Class##Num
+// int main()
+// {
+//     int Class106 = 100;
+//     printf("%d\n",CAT(Class,106));//把Class and 106 合成Class106
+
+//     return 0;
+// }
+
+// 带副作用的宏宏参数
+// int main()
+// {
+//     int a = 10;
+//     int b = a+1;
+//     int b = ++a;// 有副作用，因为得到b的时候，a也变了
+// }
+// #define MAX(x,y) ((x)>(y)? (x):(y))
+// int main()
+// {
+//     int a = 5;
+//     int b = 4;
+//     int m = MAX(a++,b++);
+//     // 替换后 int m = MAX(a++,b++) =((a++)>(b++)? (a++):(b++)) 
+//     //(a++)>(b++)?使用时 a = 5, b =4， 用完后a =6,b = 5 
+//     // (a++):(b++)// 使用时 a = 6,b =5,使用后a = 7,b = 5(因为表达式a++为真，所以b++不执行)
+//     // so  m = 6, a =7, b= 5
+//     return 0;
+
+// }
+
+//宏和函数
+// #define MAX(x,y) ((x)>(y)?(x):(y))
+// //function
+// int Max(int x, int y)
+// {
+//     return (x>y?x:y);
+// }
+// 对于浮点数比较，用宏更好， 宏是类型无关的。 宏是无法调试的。宏的名字一般大写
+//命名约定
+// 宏的名全大写
+//函数名不全大写
+//  #undef  取消前面的定义
+
+//条件编译
+// #if  #endif
+// #ifdef symbol   #endif
+//#ifndef symbol   #endif
+// if defined   #endif
+//if !defined   #endif
+// #if  #elif  # else #endif
+//嵌套指令
+// #if defined ()
+//     #ifdef OPPTION1
+//     #endif
+//     #ifdef option 2
+//     #endif
+// #elif defined()
+//     #ifdef option3
+//     #endif
+// #endif
+
+//文件包含
+// #include
+//避免重复头文件包含的方法,见下面
+//方法一
+//ifndef 
+//define
+//endif
+//方法二
+//#pragma once
+
+
+// <> and  " " 区别
+// #include<stdio.h>// 直接去库目录下查找
+// #include"test.h"// 1.先去代码所在的路径下查找，如果找不到再去库目录下查找
+
+// offsetof 写一个宏，计算结构体中某变量相对于首地址的偏移，并给出说明
+// #include <stddef.h>
+// struct S
+// {
+//     char c1;
+//     int i;
+//     char c2;
+// };
+// #define OFFSETOF(type, m_name) (size_t) &(((type*)0) -> m_name)// 将0的地址强制转换成struct S的地址
+// int main()
+// {
+//   struct S s = {0};//开辟空间 c1偏移量是c1的地址减去开辟空间的起始位置的地址，所以偏移量是0. 若将开辟空间的起始位置设为0
+//   printf("%d\n",OFFSETOF(struct S,c1));
+// //   printf("%d\n",offsetof(struct S,i));
+// //   printf("%d\n",offsetof(struct S,c2));
+
+//     return 0;
+// }
